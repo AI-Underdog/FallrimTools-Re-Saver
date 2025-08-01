@@ -1,10 +1,23 @@
 # ReSaver
 
+
 A tool for managing Skyrim save files, written in Java with JavaFX.
 
-## Prerequisites
+## For End Users (No Java or Maven Required)
 
-- Java 11 or higher
+**Windows users:**
+
+- Download the latest release ZIP or EXE package (see Releases or distribution instructions).
+- Extract the ZIP (if applicable).
+- Double-click `ReSaver.exe` inside the extracted folder to launch the application.
+- **No Java or Maven installation is required.**
+
+If you are a developer or want to build from source, see below.
+
+
+## Prerequisites (Development Only)
+
+- Java 11 or higher (Java 8+ supported; Java 24 tested)
 - Maven 3.6 or higher
 
 ## Development Setup
@@ -57,7 +70,8 @@ src/
 target/                 # Compiled classes and JARs
 ```
 
-## Building for Distribution
+
+## Building for Distribution (Advanced/Developers)
 
 To create a distributable JAR with all dependencies:
 
@@ -68,6 +82,28 @@ mvn clean package
 This will create:
 - `target/resaver-7.28-SNAPSHOT.jar` - Regular JAR
 - `target/resaver-7.28-SNAPSHOT-shaded.jar` - Fat JAR with dependencies
+
+### Creating a Standalone Windows EXE (No Java Required)
+
+If you want to generate a portable Windows EXE (for end users):
+
+1. Install JDK 14 or newer (with `jpackage` included).
+2. Run the following command in PowerShell (adjust paths as needed):
+
+```powershell
+& "C:\Program Files\Java\jdk-24\bin\jpackage.exe" `
+  --type app-image `
+  --input target `
+  --name ReSaver `
+  --main-jar ReSaver.jar `
+  --main-class resaver.ReSaver `
+  --icon src/main/resources/Disk.ico `
+  --dest dist
+```
+
+This will create a folder in `dist/ReSaver` containing `ReSaver.exe` and all required files. Distribute the entire folder to users.
+
+**Note:** For a true Windows installer (MSI), install WiX Toolset and use `--type msi` instead.
 
 ## License
 
