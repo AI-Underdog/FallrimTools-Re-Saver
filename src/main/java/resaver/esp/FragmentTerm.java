@@ -26,7 +26,7 @@ import resaver.IString;
  */
 public class FragmentTerm extends FragmentBase {
 
-    public FragmentTerm(ByteBuffer input, ESPContext ctx) {
+    public FragmentTerm(ByteBuffer input, ESPContext<? extends PluginData> ctx) {
         //input = <code>ByteBuffer</code>.debug(input);
         this.UNKNOWN = input.get();
         this.SCRIPT = new Script(input, ctx);

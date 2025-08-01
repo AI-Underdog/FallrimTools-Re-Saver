@@ -1428,7 +1428,7 @@ public class GeneralElement implements AnalyzableElement {
         if (this.hasVal("inventory_count")) {
             VSVal count = (VSVal) this.getVal("inventory_count");
             if (count.getValue() == 6) {
-                int k = 0;
+                // Debug breakpoint location
             }
         }
 

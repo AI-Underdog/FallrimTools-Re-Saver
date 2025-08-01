@@ -39,7 +39,7 @@ public class RecordCompressed extends Record {
 	 * @throws DataFormatException
 	 * @throws FieldException
      */
-    static public void skimRecord(RecordCode recordCode, Record.Header header, ByteBuffer input, ESPContext ctx) throws DataFormatException, FieldException {
+    static public void skimRecord(RecordCode recordCode, Record.Header header, ByteBuffer input, ESPContext<? extends PluginData> ctx) throws DataFormatException, FieldException {
         assert input.hasRemaining();
 
         final int DECOMPRESSED_SIZE = input.getInt();
@@ -66,7 +66,7 @@ public class RecordCompressed extends Record {
      * @throws DataFormatException
 	 * @throws FieldException
      */
-    public RecordCompressed(RecordCode recordCode, Record.Header header, ByteBuffer input, ESPContext ctx) throws DataFormatException, FieldException {
+    public RecordCompressed(RecordCode recordCode, Record.Header header, ByteBuffer input, ESPContext<? extends PluginData> ctx) throws DataFormatException, FieldException {
         assert input.hasRemaining();
         this.CODE = recordCode;
         this.HEADER = header;

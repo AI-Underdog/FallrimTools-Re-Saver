@@ -351,9 +351,6 @@ final public class Papyrus implements PapyrusElement, GlobalDataBlock {
             model.addUnknownIDList(this.UNKS);
             SUM.click(4 + this.UNKS.parallelStream().mapToInt(v -> v.calculateSize()).sum());
 
-            long positionBeforeUnbinds = input.position();
-            long x1 = SUM.getCounter();
-            
             UnbindList unbinds = null;
             try {
                 //unbinds = new UnbindList(input, CONTEXT, SUM);
@@ -363,11 +360,7 @@ final public class Papyrus implements PapyrusElement, GlobalDataBlock {
                 throw new PapyrusException("Error reading QueuedUnbinds.", ex, this);
             } finally {
                 this.UNBINDMAP = unbinds;
-                long positionAterUnbinds = input.position();
-                long unbindsSize = this.UNBINDMAP.calculateSize();
-                long positionDifference = positionAterUnbinds-positionBeforeUnbinds;
-                long x2 = SUM.getCounter();
-                long xDiff = x2 - x1;
+                this.UNBINDMAP.calculateSize();
                 model.addUnbinds(unbinds);
                 SUM.click(this.UNBINDMAP.calculateSize());
             }

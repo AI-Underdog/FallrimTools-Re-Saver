@@ -38,7 +38,12 @@ public class RecordGrup extends Record {
      * @throws FieldException
      * 
      */
-    public RecordGrup(RecordCode code, ByteBuffer headerData, ByteBuffer input, ESPContext ctx) throws RecordException, FieldException {
+    public RecordGrup(RecordCode code,
+                      ByteBuffer headerData,
+                      ByteBuffer input,
+                      ESPContext<? extends PluginData> ctx)
+            throws RecordException,
+                   FieldException {
         this.CODE = code;
         this.HEADER = headerData;
         this.RECORDS = new LinkedList<>();

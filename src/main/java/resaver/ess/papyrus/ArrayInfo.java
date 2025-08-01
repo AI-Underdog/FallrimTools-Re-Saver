@@ -26,15 +26,16 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import resaver.ess.ESS;
-import resaver.ess.Element;
 import resaver.ess.Linkable;
+import resaver.ess.Element;
 
 /**
  * Describes an array in a Skyrim savegame.
  *
  * @author Mark Fairchild
  */
-final public class ArrayInfo implements AnalyzableElement, Linkable, HasID, SeparateData, HasVariables {
+final public class ArrayInfo implements AnalyzableElement, HasID, SeparateData,
+        HasVariables {
 
     /**
      * Creates a new <code>ArrayInfo</code> by reading from a

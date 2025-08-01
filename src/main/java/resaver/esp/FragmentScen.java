@@ -27,9 +27,9 @@ import resaver.IString;
  */
 public class FragmentScen extends FragmentBase {
 
-    public FragmentScen(ByteBuffer input, ESPContext ctx) {
+    public FragmentScen(ByteBuffer input, ESPContext<? extends PluginData> ctx) {
         this.UNKNOWN = input.get();
-        this.FLAGS = input.get();
+        this.FLAGS   = input.get();
 
         if (ctx.GAME.isFO4()) {
             ctx.pushContext("FragmentScene");

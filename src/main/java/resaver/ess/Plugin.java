@@ -226,6 +226,21 @@ final public class Plugin implements AnalyzableElement, Linkable, Comparable<Plu
                 .map(i -> i.toLinkedString())
                 .collect(Collectors.toList());
         
+        DomContent modSection;
+        if (metrics.mod.isPresent()) {
+            ModMetrics mod = metrics.mod.get();
+            modSection = p(
+                h4(MessageFormat.format("The plugin probably came from \"{0}\".", mod.probableProvider)),
+                h4(MessageFormat.format("{0} script files were found in the mod list.", mod.numScripts)),
+                h4("Providers"),
+                ul(mod.providers.stream().limit(20).map(p -> li(p)).toArray(DomList))
+            );
+        } else {
+            modSection = p(em(!analysis.isPresent()
+                    ? "Mod analysis is only available for Mod Organizer 2 and requires Plugin Parsing to be enabled."
+                    : "No analysis information is available for this plugin."));
+        }
+        
         return html(body(
                 h2(MessageFormat.format("{0} PLUGIN", LIGHTWEIGHT ? "LITE" : "FULL")),
                 p(MessageFormat.format("Name: {0}", NAME)),
@@ -244,16 +259,7 @@ final public class Plugin implements AnalyzableElement, Linkable, Comparable<Plu
                         dd(makeMetric(metrics.indirectInstanceCount, null, metrics.scriptInstanceTotal, metrics.scriptInstancePercentage))
                 ),
                 h3("Mods"),
-                metrics.mod
-                        .map(mod -> p(
-                                h4(MessageFormat.format("The plugin probably came from \"{0}\".", mod.probableProvider)),
-                                h4(MessageFormat.format("{0} script files were found in the mod list.", mod.numScripts)),
-                                h4("Providers"),
-                                ul(mod.providers.stream().limit(20).map(p -> li(p)).toArray(DomList))
-                        ))
-                        .orElse(p(em(!analysis.isPresent()
-                                ? "Mod analysis is only available for Mod Organizer 2 and requires Plugin Parsing to be enabled."
-                                : "No analysis information is available for this plugin."))),
+                modSection,
                 
                 h3(instances.size() > 50 ? "Script Instances (first 50)" : "ChangeForms"),
                 instances.isEmpty() 
@@ -264,7 +270,6 @@ final public class Plugin implements AnalyzableElement, Linkable, Comparable<Plu
                 forms.isEmpty() 
                     ? p(em("None"))
                     : ul(each(formNames, name -> li(rawHtml(name))))
-                    //: ul(forms.stream().limit(50).map(i -> li(i.toHTML(null))).toArray(DomList))
 
         )).render();
     }
@@ -281,9 +286,9 @@ final public class Plugin implements AnalyzableElement, Linkable, Comparable<Plu
 
         return analysis.map(an -> 
                 an.ESPS.entrySet().stream()
-                        .filter(e -> e.getKey().equalsIgnoreCase(NAME)) // find plugin that match this one's name. There should really be at most one.
-                        .flatMap(e -> e.getValue().stream()) // get all the mods that provide that plugin.
-                        .anyMatch(m -> m.equals(mod))) // find mods that match the query.
+                        .filter(e -> e.getKey().equalsIgnoreCase(NAME))
+                        .flatMap(e -> e.getValue().stream())
+                        .anyMatch(m -> m.equals(mod)))
                 .orElse(false);
     }
 
@@ -379,7 +384,8 @@ final public class Plugin implements AnalyzableElement, Linkable, Comparable<Plu
         
         metrics.uniqueDataPercentage = (float)metrics.uniqueData / (float)ess.getOriginalSize();
 
-        analysis.ifPresentOrElse(an -> {
+        if (analysis.isPresent()) {
+            resaver.Analysis an = analysis.get();
             ModMetrics mod = new ModMetrics();
             mod.providers = an.ESPS.entrySet()
                         .stream()
@@ -397,9 +403,9 @@ final public class Plugin implements AnalyzableElement, Linkable, Comparable<Plu
                 Predicate<SortedSet<String>> modFilter = e -> e.contains(mod.probableProvider);
                 mod.numScripts = (int) an.SCRIPT_ORIGINS.values().stream().filter(modFilter).count();                
             }
-        }, () -> {
+        } else {
             metrics.mod = Optional.empty();
-        });
+        }
         
         return metrics;
     }

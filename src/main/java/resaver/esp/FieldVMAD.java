@@ -35,7 +35,11 @@ public class FieldVMAD implements Field {
      * @param big A flag indicating that this is a BIG field.
      * @param ctx
      */
-    public FieldVMAD(RecordCode recordCode, IString fieldCode, ByteBuffer input, boolean big, ESPContext ctx) {
+    public FieldVMAD(RecordCode recordCode,
+                     IString fieldCode,
+                     ByteBuffer input,
+                     boolean big,
+                     ESPContext<? extends PluginData> ctx) {
         try {
             assert input.hasRemaining();
             assert fieldCode.equals(IString.get("VMAD"));
@@ -51,7 +55,7 @@ public class FieldVMAD implements Field {
             int scriptCount = Short.toUnsignedInt(input.getShort());
 
             for (int i = 0; i < scriptCount; i++) {
-                Script script = new Script(input, ctx);
+                Script script = new Script(input, ctx);  // ctx is now parameterized
                 ctx.PLUGIN_INFO.addScriptData(script);
             }
 

@@ -413,7 +413,7 @@ public class BufferUtil {
     static public String PeekAtBuffer(ByteBuffer buf) {
         final StringBuilder peek = new StringBuilder();
         ByteBuffer slice = buf.remaining() > 2048 
-                ? buf.slice().limit(2048)
+                ? (ByteBuffer) ((java.nio.Buffer) buf.slice()).limit(2048)
                 : buf.slice();
         
         while (slice.hasRemaining()) {

@@ -37,7 +37,11 @@ public class FieldSimple implements Field, java.io.Serializable {
      * @param big A flag indicating that this is a BIG field.
      * @param ctx
      */
-    public FieldSimple(IString code, ByteBuffer input, int size, boolean big, ESPContext ctx) {
+    public FieldSimple(IString code,
+                       ByteBuffer input,
+                       int size,
+                       boolean big,
+                       ESPContext<? extends PluginData> ctx) {
         Objects.requireNonNull(input);
         this.SIZE = size;
         this.CODE = code;

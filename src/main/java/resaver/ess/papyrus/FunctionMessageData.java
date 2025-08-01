@@ -20,7 +20,6 @@ import resaver.ess.AnalyzableElement;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.SortedSet;
 import resaver.IString;
 import java.nio.ByteBuffer;
 import java.util.Optional;
@@ -32,7 +31,7 @@ import resaver.ess.Flags;
  *
  * @author Mark Fairchild
  */
-public class FunctionMessageData implements PapyrusElement, AnalyzableElement, HasVariables {
+public class FunctionMessageData implements AnalyzableElement, HasVariables {
 
     /**
      * Creates a new <code>FunctionMessageData</code> by reading from a

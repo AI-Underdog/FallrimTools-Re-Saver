@@ -31,7 +31,7 @@ final public class Property implements Entry {
      * @param input The <code>ByteBuffer</code> to read.
      * @param ctx
      */
-    public Property(ByteBuffer input, ESPContext ctx) {
+    public Property(ByteBuffer input, ESPContext<? extends PluginData> ctx) {
         this.NAME = IString.get(mf.BufferUtil.getWString(input));
         ctx.pushContext("prop:" + this.NAME);
 

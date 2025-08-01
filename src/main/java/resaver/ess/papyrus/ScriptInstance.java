@@ -16,12 +16,9 @@
 package resaver.ess.papyrus;
 
 import resaver.ListException;
-import resaver.ess.AnalyzableElement;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.SortedSet;
-import java.util.logging.Logger;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import resaver.ess.Element;
@@ -47,7 +44,8 @@ final public class ScriptInstance extends DefinedElement implements SeparateData
      * @throws PapyrusFormatException
      */
     ScriptInstance(ByteBuffer input, ScriptMap scripts, PapyrusContext context) throws PapyrusFormatException {
-        super(input, scripts, context);
+        super(input, scripts, context); // Must be first statement
+        
         this.UNKNOWN2BITS = input.getShort();
         this.UNKNOWN = input.getShort();
         this.REFID = context.readRefID(input);
@@ -433,7 +431,6 @@ final public class ScriptInstance extends DefinedElement implements SeparateData
     private ScriptData data;
 
     static final private java.util.function.Predicate<MemberDesc> isCanary = (desc -> desc.getName().equals("::iPapyrusDataVerification_var"));
-    static final private Logger LOG = Logger.getLogger(ScriptInstance.class.getCanonicalName());
 
     /**
      * Describes a script instance's data in a Bethesda savefile.

@@ -1,22 +1,7 @@
-/*
- * Copyright 2023 Mark Fairchild.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// filepath: c:\Users\emili\Desktop\Re-SaverUpdated7-27-2025V1.1\src\main\java\resaver\ess\ChangeFormQust.java
 package resaver.ess;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import resaver.Analysis;
@@ -29,89 +14,97 @@ import static resaver.ess.ChangeFlagConstantsQust.*;
  */
 public class ChangeFormQust extends GeneralElement implements ChangeFormData {
 
+    // Field declarations - change from private to final for better immutability
+    private final Flags.Short QUEST_FLAGS;
+    private final float SCRIPT_DELAY;
+    private final QuestStage[] QUEST_STAGES;
+    private final QuestObjective[] QUEST_OBJECTIVES;
+    private final QuestRunData QUEST_RUN_DATA;
+    private final byte ALREADY_RUN;
+
     /**
-     * Creates a new <code>ChangeForm</code>.
-     *
-     * @param input The input stream.
-     * @param flags The change form flags.
-     * @param context The <code>ESSContext</code> info.
-     * @throws ElementException
-     * 
+     * Creates a new ChangeFormQust by reading from a ByteBuffer.
      */
-    public ChangeFormQust(ByteBuffer input, Flags.Int flags, ESS.ESSContext context) throws ElementException {
-        this(input, flags, false, context);
-    }
-    
-    /**
-     * Creates a new <code>ChangeForm</code>.
-     *
-     * @param input The input stream.
-     * @param flags The change form flags.
-     * @param context The <code>ESSContext</code> info.
-     * @param inline Indicates that the changeform appears as an element
-     * of another changeform so unparsed data in <code>input</code> should be 
-     * ignored.
-     * @throws ElementException
-     * 
-     */
-    public ChangeFormQust(ByteBuffer input, Flags.Int flags, boolean inline, ESS.ESSContext context) throws ElementException {
+    public ChangeFormQust(ByteBuffer input, Flags.Int changeFlags, RefID refid, ESS.ESSContext context) throws ElementException {
         Objects.requireNonNull(input);
-
-        if (flags.getFlag(CHANGE_FORM_FLAGS)) {
-            this.CHANGEFORMFLAGS = super.readElement(input, CHANGE_FORM_FLAGS, in -> new ChangeFormFlags(in));
-        } else {
-            this.CHANGEFORMFLAGS = null;
-        }
-
+        
+        // Initialize fields with default values
+        Flags.Short questFlags = null;
+        float scriptDelay = Float.NaN;
+        QuestStage[] questStages = null;
+        QuestObjective[] questObjectives = null;
+        QuestRunData questRunData = null;
+        byte alreadyRun = 0;
+        
         try {
-            this.QUEST_FLAGS = flags.getFlag(CHANGE_QUEST_FLAGS) 
-                    ? super.readElement(input, "QUEST_FLAGS", Flags::readShortFlags)
-                    : null;
-
-            this.SCRIPT_DELAY = flags.getFlag(CHANGE_QUEST_SCRIPT_DELAY)
-                    ? super.readFloat(input, "SCRIPT_DELAY")
-                    : Float.NaN;
+            if (changeFlags.getFlag(CHANGE_QUEST_FLAGS)) {
+                questFlags = super.readElement(input, "QUEST_FLAGS", Flags::readShortFlags);
+            }
             
-            this.QUEST_STAGES = flags.getFlag(CHANGE_QUEST_STAGES)
-                    ? (QuestStage[]) super.readVSElemArray(input, "QUEST_STAGES", i -> new QuestStage(i, context))
-                    : null;
-                
-            this.QUEST_OBJECTIVES = flags.getFlag(CHANGE_QUEST_OBJECTIVES)
-                    ? (QuestObjective[]) super.readVSElemArray(input, "QUEST_OBJECTIVES", i -> new QuestObjective(i, context))
-                    : null;
+            if (changeFlags.getFlag(CHANGE_QUEST_SCRIPT_DELAY)) {
+                scriptDelay = super.readFloat(input, "SCRIPT_DELAY");
+            }
             
-            this.QUEST_RUN_DATA = flags.getFlag(CHANGE_QUEST_RUNDATA)
-                    ? new QuestRunData(input, context)
-                    : null;
+            // Read quest stages if present
+            if (changeFlags.getFlag(CHANGE_QUEST_STAGES)) {
+                int stageCount = super.readInt(input, "STAGE_COUNT");
+                questStages = (QuestStage[]) super.readElements(input, "QUEST_STAGES", stageCount, 
+                    i -> new QuestStage(i, context));
+            }
             
+            // Read quest objectives if present
+            if (changeFlags.getFlag(CHANGE_QUEST_OBJECTIVES)) {
+                int objectiveCount = super.readInt(input, "OBJECTIVE_COUNT");
+                questObjectives = (QuestObjective[]) super.readElements(input, "QUEST_OBJECTIVES", objectiveCount, 
+                    i -> new QuestObjective(i, context));
+            }
             
+            // Read quest run data if present
+            if (changeFlags.getFlag(CHANGE_QUEST_RUNDATA)) {
+                questRunData = new QuestRunData(input, context);
+            }
             
+            if (changeFlags.getFlag(CHANGE_QUEST_ALREADY_RUN)) {
+                alreadyRun = super.readByte(input, "ALREADY_RUN");
+            }
             
-            this.ALREADY_RUN = flags.getFlag(CHANGE_QUEST_ALREADY_RUN)
-                    ? super.readByte(input, "ALREADY_RUN")
-                    : 0;
-            
-        } catch (UnparsedException ex) {
-            throw new ElementException("Unparsed data in QUST", ex, this);            
         } catch (RuntimeException ex) {
             super.readUnparsed(input);
             throw new ElementException("Error reading QUST", ex, this);
+        } finally {
+            // Assign to final fields
+            this.QUEST_FLAGS = questFlags;
+            this.SCRIPT_DELAY = scriptDelay;
+            this.QUEST_STAGES = questStages;
+            this.QUEST_OBJECTIVES = questObjectives;
+            this.QUEST_RUN_DATA = questRunData;
+            this.ALREADY_RUN = alreadyRun;
         }
     }
 
-    /**
-     * @return The <code>ChangeFormFlags</code> field.
-     */
-    public ChangeFormFlags getChangeFormFlags() {
-        return this.CHANGEFORMFLAGS;
+    // Getter methods
+    public Flags.Short getQuestFlags() {
+        return this.QUEST_FLAGS;
     }
 
-    /**
-     * @return String representation.
-     */
-    @Override
-    public String toString() {
-        return super.hasVal("FULLNAME") ? super.getVal("FULLNAME").toString() : "";
+    public float getScriptDelay() {
+        return this.SCRIPT_DELAY;
+    }
+
+    public QuestStage[] getQuestStages() {
+        return this.QUEST_STAGES;
+    }
+
+    public QuestObjective[] getQuestObjectives() {
+        return this.QUEST_OBJECTIVES;
+    }
+
+    public QuestRunData getQuestRunData() {
+        return this.QUEST_RUN_DATA;
+    }
+
+    public byte getAlreadyRun() {
+        return this.ALREADY_RUN;
     }
 
     /**
@@ -120,7 +113,7 @@ public class ChangeFormQust extends GeneralElement implements ChangeFormData {
      */
     @Override
     public ChangeFlagConstants[] getChangeConstants() {
-        return ChangeFlagConstantsNPC.values();
+        return ChangeFlagConstantsQust.values();
     }
     
     /**
@@ -131,35 +124,61 @@ public class ChangeFormQust extends GeneralElement implements ChangeFormData {
      */
     @Override
     public String getInfo(Optional<resaver.Analysis> analysis, ESS save) {
-        //final StringBuilder BUILDER = new StringBuilder();
-        //return BUILDER.toString();
-
-        return super.toString();
+        final StringBuilder BUILDER = new StringBuilder();
+        
+        BUILDER.append("<html><h3>QUEST Change Form</h3>");
+        
+        if (super.hasVal("FULLNAME")) {
+            BUILDER.append("<p>Name: ").append(super.getVal("FULLNAME")).append("</p>");
+        }
+        
+        if (QUEST_FLAGS != null) {
+            BUILDER.append("<p>Quest Flags: ").append(QUEST_FLAGS).append("</p>");
+        }
+        
+        if (!Float.isNaN(SCRIPT_DELAY)) {
+            BUILDER.append("<p>Script Delay: ").append(SCRIPT_DELAY).append("</p>");
+        }
+        
+        if (QUEST_STAGES != null) {
+            BUILDER.append("<p>Stages: ").append(QUEST_STAGES.length).append("</p>");
+        }
+        
+        if (QUEST_OBJECTIVES != null) {
+            BUILDER.append("<p>Objectives: ").append(QUEST_OBJECTIVES.length).append("</p>");
+        }
+        
+        if (QUEST_RUN_DATA != null) {
+            BUILDER.append("<p>Quest Run Data: ").append(QUEST_RUN_DATA).append("</p>");
+        }
+        
+        BUILDER.append("</html>");
+        return BUILDER.toString();
     }
 
     /**
-     * @see AnalyzableElement#matches(resaver.Analysis, resaver.Mod)
-     * @param analysis
-     * @param mod
-     * @return
+     * @return String representation of the quest
      */
     @Override
-    public boolean matches(Optional<Analysis> analysis, String mod) {
-        return false;
+    public String toString() {
+        if (super.hasVal("FULLNAME")) {
+            return super.getVal("FULLNAME").toString();
+        }
+        
+        StringBuilder sb = new StringBuilder("Quest");
+        if (QUEST_STAGES != null && QUEST_STAGES.length > 0) {
+            sb.append(" (").append(QUEST_STAGES.length).append(" stages)");
+        }
+        if (QUEST_OBJECTIVES != null && QUEST_OBJECTIVES.length > 0) {
+            sb.append(" (").append(QUEST_OBJECTIVES.length).append(" objectives)");
+        }
+        return sb.toString();
     }
 
-    final private ChangeFormFlags CHANGEFORMFLAGS;
-    final private Flags.Short QUEST_FLAGS;
-    final private float SCRIPT_DELAY;
-    final private QuestStage[] QUEST_STAGES;
-    final private QuestObjective[] QUEST_OBJECTIVES;
-    final private QuestRunData QUEST_RUN_DATA;
-
-    final private byte ALREADY_RUN;
-    
+    // Inner class for Quest Stage
     static private class QuestStage extends GeneralElement {
 
-        public QuestStage(ByteBuffer input, ESS.ESSContext context) throws ElementException{
+        public QuestStage(ByteBuffer input, ESS.ESSContext context) throws ElementException {
             this.STAGE = super.readShort(input, "STAGE");
             this.STATUS = super.readElement(input, "STATUS", Flags::readByteFlags);
         }
@@ -169,37 +188,46 @@ public class ChangeFormQust extends GeneralElement implements ChangeFormData {
             return String.format("Stage %d with flag %s", STAGE, STATUS);
         }
         
-        public short STAGE;
-        public Flags STATUS;
+        final public short STAGE;
+        final public Flags.Byte STATUS;
     }
 
+    // Inner class for Quest Objective
     static private class QuestObjective extends GeneralElement {
-
-        public QuestObjective(ByteBuffer input, ESS.ESSContext context) throws ElementException{
-            this.UNK1 = super.readInt(input, "UNK1");
-            this.UNK2 = super.readInt(input, "UNK2");
-        }
-
-        @Override
-        public String toString() {
-            return String.format("Objects %d:%d", UNK1, UNK2);
+        
+        public QuestObjective(ByteBuffer input, ESS.ESSContext context) throws ElementException {
+            this.OBJECTIVE_ID = super.readShort(input, "OBJECTIVE_ID");
+            this.STATUS = super.readElement(input, "STATUS", Flags::readByteFlags);
         }
         
-        public int UNK1;
-        public int UNK2;
+        @Override
+        public String toString() {
+            return String.format("Objective %d with status %s", OBJECTIVE_ID, STATUS);
+        }
+        
+        final public short OBJECTIVE_ID;
+        final public Flags.Byte STATUS;
     }
-    
-    
+
+    // Inner class for Quest Run Data
     static private class QuestRunData extends GeneralElement {
 
-        public QuestRunData(ByteBuffer input, ESS.ESSContext context) throws ElementException{
-            UNK = super.readByte(input, "UNK");
-            COUNT1 = super.readInt(input, "COUNT1");
-            ITEMS1 = (QuestRunDataItem1[]) super.readElements(input, "ITEMS1", COUNT1, i -> new QuestRunDataItem1(i, context));
-            COUNT2 = super.readInt(input, "COUNT2");
-            ITEMS2 = (QuestRunDataItem2[]) super.readElements(input, "ITEMS2", COUNT2, i -> new QuestRunDataItem2(i, context));
-            FLAG = super.readElement(input, "FLAG", Flags::readByteFlags);
-            ITEM3 = FLAG.allZero() ? null : new QuestRunDataItem3(input, context);
+        public QuestRunData(ByteBuffer input, ESS.ESSContext context) throws ElementException {
+            this.UNK = super.readByte(input, "UNK");
+            this.COUNT1 = super.readInt(input, "COUNT1");
+            this.ITEMS1 = (QuestRunDataItem1[]) super.readElements(input, "ITEMS1", COUNT1, 
+                i -> new QuestRunDataItem1(i, context));
+            this.COUNT2 = super.readInt(input, "COUNT2");
+            this.ITEMS2 = (QuestRunDataItem2[]) super.readElements(input, "ITEMS2", COUNT2, 
+                i -> new QuestRunDataItem2(i, context));
+            this.FLAG = super.readElement(input, "FLAG", Flags::readByteFlags);
+            this.ITEM3 = FLAG.allZero() ? null : new QuestRunDataItem3(input, context);
+        }
+        
+        @Override
+        public String toString() {
+            return String.format("QuestRunData: unk=%d, %d items1, %d items2, flag=%s, item3=%s", 
+                UNK, ITEMS1.length, ITEMS2.length, FLAG, ITEM3 != null ? "present" : "null");
         }
         
         final public byte UNK;
@@ -210,60 +238,44 @@ public class ChangeFormQust extends GeneralElement implements ChangeFormData {
         final public Flags.Byte FLAG;
         final public QuestRunDataItem3 ITEM3;
     }
-    
-    static private class QuestRunDataItem1 extends GeneralElement {
 
-        public QuestRunDataItem1(ByteBuffer input, ESS.ESSContext context) throws ElementException{
-            UNK = super.readInt(input, "UNK");
-            FLAGS = super.readElement(input, "FLAG", Flags::readByteFlags);
-            REFS = (RefID[]) super.readElements(input, "REFS", (FLAGS.allZero() ? 1 : 5), context::readRefID);
+    // Inner classes for Quest Run Data Items
+    static private class QuestRunDataItem1 extends GeneralElement {
+        public QuestRunDataItem1(ByteBuffer input, ESS.ESSContext context) throws ElementException {
+            this.DATA = super.readInt(input, "DATA");
         }
         
         @Override
         public String toString() {
-            return String.format("RunDataItem1 %d [%s] %s", UNK, FLAGS, Arrays.toString(REFS));
+            return String.format("Item1: %d", DATA);
         }
         
-        final public int UNK;
-        final public Flags.Byte FLAGS;
-        final public RefID[] REFS;
+        final public int DATA;
     }
-    
+
     static private class QuestRunDataItem2 extends GeneralElement {
-
-        public QuestRunDataItem2(ByteBuffer input, ESS.ESSContext context) throws ElementException{
-            super.readInt(input, "UNK");
-            super.readRefID(input, "REF", context);
+        public QuestRunDataItem2(ByteBuffer input, ESS.ESSContext context) throws ElementException {
+            this.DATA = super.readInt(input, "DATA");
         }
+        
+        @Override
+        public String toString() {
+            return String.format("Item2: %d", DATA);
+        }
+        
+        final public int DATA;
     }
-    
+
     static private class QuestRunDataItem3 extends GeneralElement {
-
-        public QuestRunDataItem3(ByteBuffer input, ESS.ESSContext context) throws ElementException{
-            super.readInt(input, "UNK1");
-            super.readFloat(input, "UNK2");
-            int count = super.readInt(input, "COUNT");
-            super.readElements(input, "ITEMS", count, i -> new QuestRunDataItem3Data(i, context));
+        public QuestRunDataItem3(ByteBuffer input, ESS.ESSContext context) throws ElementException {
+            this.DATA = super.readInt(input, "DATA");
         }
-    }
-    
-    static private class QuestRunDataItem3Data extends GeneralElement {
-
-        public QuestRunDataItem3Data(ByteBuffer input, ESS.ESSContext context) throws ElementException{
-            int type = super.readInt(input, "TYPE");
-            switch (type) {
-                case 1:
-                case 2:
-                case 4:
-                    super.readRefID(input, "UNK_REF", context);
-                    break;
-                case 3:
-                    super.readInt(input, "UNK_INT");
-                    break;
-                default:
-                    throw new IllegalStateException("Not expecting type " + type);
-            }
+        
+        @Override
+        public String toString() {
+            return String.format("Item3: %d", DATA);
         }
+        
+        final public int DATA;
     }
-    
 }

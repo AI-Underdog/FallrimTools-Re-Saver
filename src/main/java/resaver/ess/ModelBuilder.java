@@ -592,10 +592,10 @@ public class ModelBuilder {
         }
         
         if (node.hasElement() && node.getElement() instanceof Plugin) {
-            int k = 0;            
+            // Debug point for plugin elements           
         }
         if (node.hasElement(Plugin.class)) {
-            int k = 0;
+            // Debug point for plugin class elements
         }
         
         int mass = 0;
@@ -633,14 +633,13 @@ public class ModelBuilder {
                 return this;
             }
             if (this.getName().contains("Plugin")) {
-                int k = 0;
                 System.out.println("\tSorting plugin group");
             }
             
             this.getChildren().sort((n1, n2) -> {
                 if ((n1.hasElement() && n1.getElement() instanceof Plugin)
                         || (n2.hasElement() && n2.getElement() instanceof Plugin)) {
-                    int k = 0;
+                    // Debug point for plugin sorting
                 }
                 if (n1.hasElement() && n2.hasElement()) {
                     Element e1 = n1.getElement();

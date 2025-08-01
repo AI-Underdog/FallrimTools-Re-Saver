@@ -17,12 +17,10 @@ package resaver.ess.papyrus;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.SortedSet;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Optional;
 import resaver.ess.AnalyzableElement;
-import resaver.ess.Linkable;
 
 /**
  * <code>DefinedElement</code> is a superclass of <code>ScriptInstance</code>,
@@ -31,7 +29,7 @@ import resaver.ess.Linkable;
  *
  * @author Mark Fairchild
  */
-abstract public class DefinedElement implements AnalyzableElement, Linkable, PapyrusElement, HasID {
+abstract public class DefinedElement implements PapyrusElement, HasID, AnalyzableElement {
 
     /**
      * Creates a new <code>DefinedElement</code> by reading from a
@@ -50,11 +48,15 @@ abstract public class DefinedElement implements AnalyzableElement, Linkable, Pap
         this.ID = context.readEID(input);
         this.DEFINITION_NAME = context.readTString(input);
         this.DEFINITION = defs.getOrDefault(this.DEFINITION_NAME, null);
-        this.DEFINITION.incrementInstanceCount();
+        if (this.DEFINITION != null) {
+            this.DEFINITION.incrementInstanceCount();
+        } else {
+            throw new PapyrusFormatException("Definition not found for name: " + this.DEFINITION_NAME);
+        }
     }
 
     /**
-     * @see resaver.ess.Element#write(resaver.ByteBuffer)
+     * @see PapyrusElement#write(java.nio.ByteBuffer)
      * @param output The output stream.
      */
     @Override
@@ -65,7 +67,7 @@ abstract public class DefinedElement implements AnalyzableElement, Linkable, Pap
     }
 
     /**
-     * @see resaver.ess.Element#calculateSize()
+     * @see PapyrusElement#calculateSize()
      * @return The size of the <code>Element</code> in bytes.
      */
     @Override
@@ -105,7 +107,7 @@ abstract public class DefinedElement implements AnalyzableElement, Linkable, Pap
     abstract public boolean isUndefined();
 
     /**
-     * @see AnalyzableElement#matches(Optional<resaver.Analysis>, resaver.Mod)
+     * @see AnalyzableElement#matches(Optional<resaver.Analysis>, String)
      * @param analysis
      * @param mod
      * @return
@@ -140,6 +142,5 @@ abstract public class DefinedElement implements AnalyzableElement, Linkable, Pap
 
     final private EID ID;
     final private TString DEFINITION_NAME;
-    final private Definition DEFINITION;   
-    
+    final private Definition DEFINITION;
 }

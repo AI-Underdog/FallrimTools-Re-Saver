@@ -28,7 +28,7 @@ import resaver.ess.Linkable;
  *
  * @author Mark Fairchild
  */
-final public class QueuedUnbind implements PapyrusElement, AnalyzableElement, Linkable, HasID {
+final public class QueuedUnbind implements AnalyzableElement, HasID {
 
     /**
      * Creates a new <code>MemberData</code> by reading from a

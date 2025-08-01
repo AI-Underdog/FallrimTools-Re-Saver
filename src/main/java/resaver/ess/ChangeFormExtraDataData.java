@@ -365,10 +365,10 @@ public class ChangeFormExtraDataData extends GeneralElement {
                 break;
             case 135:
                 this.NAME = "TEST";
-                RefID r1 = super.readRefID(input, "R1", context);
-                RefID r2 = super.readRefID(input, "R2", context);
-                RefID r3 = super.readRefID(input, "R3", context);
-                RefID r4 = super.readRefID(input, "R4", context);
+                super.readRefID(input, "R1", context);
+                super.readRefID(input, "R2", context);
+                super.readRefID(input, "R3", context);
+                super.readRefID(input, "R4", context);
                 this.BRIEF = true;
                 break;
             case 136:

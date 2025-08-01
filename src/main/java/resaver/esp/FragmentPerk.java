@@ -27,7 +27,7 @@ import resaver.IString;
  */
 public class FragmentPerk extends FragmentBase {
 
-    public FragmentPerk(ByteBuffer input, ESPContext ctx) {
+    public FragmentPerk(ByteBuffer input, ESPContext<? extends PluginData> ctx) {
         try {
             this.UNKNOWN = input.get();
 

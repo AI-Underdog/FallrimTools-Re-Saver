@@ -27,10 +27,14 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Set;
+import java.util.Map;
 import java.util.logging.Logger;
 import resaver.Game;
 import resaver.ess.Plugin;
 import resaver.ess.PluginInfo;
+import javafx.scene.control.Tab;
+import resaver.gui.ModImpactPanel;
 
 /**
  * Describes a Skyrim PEX script and will readFully and write it from iostreams.
@@ -72,8 +76,11 @@ final public class ESP implements Entry {
             ((Buffer) BUFFER).flip();
           
             try {
-                final RecordTes4 TES4 = new RecordTes4(BUFFER, plugin, plugins, new ESPContext(game, plugin, data, null));
-                final ESPContext<T> CTX = new ESPContext<>(game, plugin, data, TES4);
+                // first build a typed "pre" context for TES4
+                final ESPContext<T> preCTX = new ESPContext<>(game, plugin, data, null);
+                final RecordTes4 TES4    = new RecordTes4(BUFFER, plugin, plugins, preCTX);
+                // now build the real context, also typed
+                final ESPContext<T> CTX   = new ESPContext<>(game, plugin, data, TES4);
 
                 while (BUFFER.hasRemaining()) {
                     Record.skimRecord(BUFFER, CTX);
@@ -117,9 +124,8 @@ final public class ESP implements Entry {
         this.RECORDS = new LinkedList<>();
 
         PluginData nullHandler = new PluginData(){};
-        
-        final RecordTes4 TES4 = new RecordTes4(input, plugin, plugins, new ESPContext(game, plugin, nullHandler, null));
-        final ESPContext CTX = new ESPContext(game, plugin, nullHandler, TES4);
+        final RecordTes4 TES4 = new RecordTes4(input, plugin, plugins, new ESPContext<PluginData>(game, plugin, nullHandler, null));
+        final ESPContext<PluginData> CTX = new ESPContext<>(game, plugin, nullHandler, TES4);
         CTX.pushContext(plugin.NAME);
         this.RECORDS.add(TES4);
 
@@ -127,6 +133,13 @@ final public class ESP implements Entry {
             Record record = Record.readRecord(input, CTX);
             this.RECORDS.add(record);
         }
+        // Initialize new metadata fields with default values
+        this.modName = name != null ? name : "";
+        this.author = "";
+        this.version = "";
+        this.formIds = new java.util.HashSet<>();
+        this.modifiedRecords = new java.util.HashMap<>();
+        this.injectedScripts = new java.util.ArrayList<>();
     }
 
     /**
@@ -165,4 +178,45 @@ final public class ESP implements Entry {
     final private List<Record> RECORDS;
 
     static final private Logger LOG = Logger.getLogger(ESP.class.getCanonicalName());
+
+    private final String modName;
+    private final String author;
+    private final String version;
+    private final Set<String> formIds;
+    private final Map<String, String> modifiedRecords;
+    private final List<String> injectedScripts;
+
+    public ESP(String modName, String author, String version, Set<String> formIds, Map<String, String> modifiedRecords, List<String> injectedScripts) {
+        this.modName = modName;
+        this.author = author;
+        this.version = version;
+        this.formIds = formIds;
+        this.modifiedRecords = modifiedRecords;
+        this.injectedScripts = injectedScripts;
+        this.RECORDS = new LinkedList<>(); // Ensure RECORDS is always initialized
+    }
+
+    public String getModName() {
+        return modName;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public Set<String> getFormIds() {
+        return formIds;
+    }
+
+    public Map<String, String> getModifiedRecords() {
+        return modifiedRecords;
+    }
+
+    public List<String> getInjectedScripts() {
+        return injectedScripts;
+    }
 }

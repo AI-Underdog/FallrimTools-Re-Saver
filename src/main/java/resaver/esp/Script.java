@@ -32,7 +32,8 @@ public class Script implements Entry {
      * @param input The <code>ByteBuffer</code> to read.
      * @param ctx
      */
-    public Script(ByteBuffer input, ESPContext ctx) {
+    public Script(ByteBuffer input,
+                  ESPContext<? extends PluginData> ctx) {
         this.NAME = IString.get(mf.BufferUtil.getWString(input));
         //if (this.NAME.isEmpty()) {
         //    this.PROPERTIES = null;

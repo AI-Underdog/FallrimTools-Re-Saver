@@ -542,7 +542,6 @@ final public class FragmentTask implements PapyrusElement, Linkable {
 
         @Override
         public String toHTML(Element target) {
-            final StringBuilder BUF = new StringBuilder();
             return new StringBuilder()
                     .append(this.FORM == null ? this.REFID.toHTML(target) : this.FORM.toHTML(target))
                     .append(" ").append(this.TSTRING)
@@ -552,7 +551,6 @@ final public class FragmentTask implements PapyrusElement, Linkable {
 
         @Override
         public String toString() {
-            final StringBuilder BUF = new StringBuilder();
             return new StringBuilder()
                     .append(this.FORM == null ? this.REFID : this.FORM)
                     .append(" ").append(this.TSTRING)

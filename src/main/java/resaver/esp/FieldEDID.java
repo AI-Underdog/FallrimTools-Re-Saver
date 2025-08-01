@@ -34,7 +34,7 @@ public class FieldEDID extends FieldSimple {
      * @param big A flag indicating that this is a BIG field.
      * @param ctx The mod descriptor.
      */
-    public FieldEDID(IString code, ByteBuffer input, int size, boolean big, ESPContext ctx) {
+    public FieldEDID(IString code, ByteBuffer input, int size, boolean big, ESPContext<?> ctx) {
         super(code, input, size, big, ctx);
         this.VALUE = mf.BufferUtil.getZString(super.getByteBuffer());
     }

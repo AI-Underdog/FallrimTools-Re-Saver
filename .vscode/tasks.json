@@ -1,0 +1,61 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Maven: Clean",
+			"type": "shell",
+			"command": "mvn",
+			"args": ["clean"],
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "Maven: Compile",
+			"type": "shell",
+			"command": "mvn",
+			"args": ["compile"],
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "Maven: Test",
+			"type": "shell",
+			"command": "mvn",
+			"args": ["test"],
+			"group": "test",
+			"problemMatcher": []
+		},
+		{
+			"label": "Maven: Package",
+			"type": "shell",
+			"command": "mvn",
+			"args": ["package"],
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "Maven: Clean and Compile",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"clean",
+				"compile"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [
+				"$tsc"
+			]
+		},
+		{
+			"label": "JavaFX: Run",
+			"type": "shell",
+			"command": "mvn",
+			"args": ["javafx:run"],
+			"group": "build",
+			"problemMatcher": []
+		}
+	]
+}

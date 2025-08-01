@@ -1,0 +1,37 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "java.project.sourcePaths": [
+            "src/main/java"
+        ],
+        "java.project.testSourcePaths": [
+            "src/test/java"
+        ],
+        "java.project.resourcePaths": [
+            "src/main/resources"
+        ],
+        "java.configuration.updateBuildConfiguration": "automatic",
+        "java.compile.nullAnalysis.mode": "automatic",
+        "java.format.settings.url": ".vscode/java-google-style.xml",
+        "files.exclude": {
+            "**/target": true,
+            "**/.classpath": true,
+            "**/.project": true,
+            "**/.settings": true,
+            "**/.factorypath": true
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "vscjava.vscode-java-pack",
+            "redhat.java",
+            "vscjava.vscode-java-debug",
+            "vscjava.vscode-java-test",
+            "vscjava.vscode-maven"
+        ]
+    }
+}

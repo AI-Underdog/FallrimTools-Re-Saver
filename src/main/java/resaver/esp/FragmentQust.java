@@ -27,7 +27,7 @@ import resaver.IString;
  */
 public class FragmentQust extends FragmentBase {
 
-    public FragmentQust(ByteBuffer input, ESPContext ctx) {
+    public FragmentQust(ByteBuffer input, ESPContext<? extends PluginData> ctx) {
         try {
             this.UNKNOWN = input.get();
             int fragmentCount = Short.toUnsignedInt(input.getShort());
@@ -112,7 +112,7 @@ public class FragmentQust extends FragmentBase {
      */
     public class Fragment implements Entry {
 
-        public Fragment(ByteBuffer input, ESPContext ctx) {
+        public Fragment(ByteBuffer input, ESPContext<? extends PluginData> ctx) {
             this.STAGE = Short.toUnsignedInt(input.getShort());
             this.UNKNOWN1 = input.getShort();
             this.LOGENTRY = input.getInt();
@@ -152,7 +152,7 @@ public class FragmentQust extends FragmentBase {
      */
     public class Alias implements Entry {
 
-        public Alias(ByteBuffer input, ESPContext ctx) {
+        public Alias(ByteBuffer input, ESPContext<? extends PluginData> ctx) {
             this.OBJECT = input.getLong();
             this.VERSION = input.getShort();
             this.OBJFORMAT = input.getShort();

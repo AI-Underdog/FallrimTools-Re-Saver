@@ -36,7 +36,7 @@ import resaver.ess.papyrus.ScriptInstance;
  *
  * @author Mark Fairchild
  */
-final public class ChangeForm implements Element, AnalyzableElement, Linkable {
+final public class ChangeForm implements AnalyzableElement, Linkable {
 
     /**
      * Creates a new <code>ChangeForm</code> by reading from a
@@ -231,26 +231,26 @@ final public class ChangeForm implements Element, AnalyzableElement, Linkable {
             ((Buffer) UNCOMPRESSED).flip();
 
             if (this.ISCOMPRESSED) {
-                final java.util.zip.Deflater DEFLATER = new java.util.zip.Deflater();
+                // Deflater only works on byte[], so pull bytes out of the ByteBuffer
+                byte[] uncompressedBytes = new byte[UNCOMPRESSED.remaining()];
+                UNCOMPRESSED.get(uncompressedBytes);
+
+                java.util.zip.Deflater deflater = new java.util.zip.Deflater();
                 try {
-                    DEFLATER.setInput(UNCOMPRESSED);
-                    DEFLATER.finish();
+                    deflater.setInput(uncompressedBytes);
+                    deflater.finish();
 
-                    ByteBuffer COMPRESSED = ByteBuffer.allocate(2 * UNCOMPRESSED_SIZE);
-                    DEFLATER.deflate(COMPRESSED);
-                    ((Buffer) COMPRESSED).flip();
+                    // allocate an output buffer and deflate into it
+                    byte[] tempBuf = new byte[2 * UNCOMPRESSED_SIZE];
+                    int compressedLen = deflater.deflate(tempBuf);
 
-                    this.length2 = DEFLATER.getTotalIn();
-                    this.length1 = DEFLATER.getTotalOut();
-
-                    final byte[] NEW_RAW = new byte[COMPRESSED.limit()];
-                    COMPRESSED.get(NEW_RAW);
-                    this.rawData = NEW_RAW;
+                    this.length2 = deflater.getTotalIn();
+                    this.length1 = deflater.getTotalOut();
+                    this.rawData = java.util.Arrays.copyOf(tempBuf, compressedLen);
                 } finally {
-                    DEFLATER.end();
+                    deflater.end();
                 }
-
-            } else {
+             } else {
                 this.length1 = UNCOMPRESSED_SIZE;
                 final byte[] NEW_RAW = new byte[UNCOMPRESSED_SIZE];
                 UNCOMPRESSED.get(NEW_RAW);
@@ -356,7 +356,8 @@ final public class ChangeForm implements Element, AnalyzableElement, Linkable {
                     this.parsedData = new ChangeFormRela(BODYDATA, this.changeFlags, this.REFID, context);
                     break;
                 case QUST:
-                    this.parsedData = new ChangeFormQust(BODYDATA, this.changeFlags, context);
+                    // Fix: Add the missing RefID parameter
+                    this.parsedData = new ChangeFormQust(BODYDATA, this.changeFlags, this.REFID, context);
                     break;
                 default:
                     if (bestEffort) {
@@ -441,9 +442,7 @@ final public class ChangeForm implements Element, AnalyzableElement, Linkable {
 
         if (null != this.REFID.PLUGIN) {
             BUF.append(" (").append(this.REFID.PLUGIN).append(")");
-        } else if (this.REFID.getType() == RefID.Type.FORMIDX) {
-            int k = 0;
-        }
+        } 
         BUF.append(" refid=").append(this.REFID.toString());
 
         if (parsedData != null && this.parsedData instanceof GeneralElement) {

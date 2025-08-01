@@ -20,34 +20,28 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import resaver.IString;
 
 /**
- * FieldSimple represents a FULL (fullname) field.
- *
- * @author Mark Fairchild
+ * FieldFull represents a FULL (fullname) field.
  */
 public class FieldFull extends FieldSimple {
-
     /**
-     * Creates a new FieldFULL by reading it from a <code>ByteBuffer</code>.
-     *
-     * @param code The field code.
-     * @param input The <code>ByteBuffer</code> to read.
-     * @param size The amount of data.
-     * @param big A flag indicating that this is a BIG field.
-     * @param ctx The mod descriptor.
+     * @param ctx generic plugin‐data context
      */
-    public FieldFull(IString code, ByteBuffer input, int size, boolean big, ESPContext ctx) {
-        super(code, input, size, big, ctx);
+    public FieldFull(IString code,
+                     ByteBuffer input,
+                     int size,
+                     boolean big,
+                     ESPContext<? extends PluginData> ctx)
+    {
+        super(code,input,size,big,ctx);
 
         if (ctx.TES4.getHeader().isLocalized()) {
             assert super.getData().length == 4;
             int val = super.getByteBuffer().getInt();
-            this.IDX = val; //(ctx.TES4.PLUGIN.INDEX << 24) | val;
+            this.IDX = val;
             this.STR = null;
-            
         } else if (super.getData().length == 0) {
             this.STR = null;
             this.IDX = -1;
-
         } else {
             this.STR = new String(super.getData(), UTF_8);
             this.IDX = -1;

@@ -19,22 +19,18 @@ import java.nio.ByteBuffer;
 import resaver.IString;
 
 /**
- * FieldSimple represents a Name field.
- *
- * @author Mark Fairchild
+ * FieldName represents a NAME field.
  */
 public class FieldName extends FieldSimple {
 
     /**
-     * Creates a new FieldSimple by reading it from a <code>ByteBuffer</code>.
-     *
-     * @param code The field code.
-     * @param input The <code>ByteBuffer</code> to read.
-     * @param size The amount of data.
-     * @param big A flag indicating that this is a BIG field.
-     * @param ctx The mod descriptor.
+     * @param ctx generic plugin-data context
      */
-    public FieldName(IString code, ByteBuffer input, int size, boolean big, ESPContext ctx) {
+    public FieldName(IString code,
+                     ByteBuffer input,
+                     int size,
+                     boolean big,
+                     ESPContext<? extends PluginData> ctx) {
         super(code, input, size, big, ctx);
         assert size == 4;
         int id = super.getByteBuffer().getInt();

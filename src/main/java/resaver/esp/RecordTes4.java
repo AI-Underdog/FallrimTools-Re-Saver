@@ -45,7 +45,11 @@ public class RecordTes4 extends Record {
      * @param ctx The mod descriptor.
      * @throws RecordException
      */
-    public RecordTes4(ByteBuffer input, Plugin plugin, PluginInfo plugins, ESPContext ctx) throws RecordException {
+    public RecordTes4(ByteBuffer input,
+                      Plugin plugin,
+                      PluginInfo plugins,
+                      ESPContext<? extends PluginData> ctx)
+            throws RecordException {
         try {
         this.CODE = RecordCode.TES4;
         this.PLUGIN = Objects.requireNonNull(plugin);
@@ -167,9 +171,10 @@ public class RecordTes4 extends Record {
      * @param ctx The mod descriptor.
      * @return
      */
-    public int remapFormID(int id, ESPContext ctx) {
-        int headerIndex = id >>> 24;
-        assert 0 <= headerIndex && headerIndex < 256;
+    public int remapFormID(int id,
+                           ESPContext<? extends PluginData> ctx) {
+         int headerIndex = id >>> 24;
+         assert 0 <= headerIndex && headerIndex < 256;
 
         if (headerIndex == this.MASTERS.size()) {
             return PluginInfo.makeFormID(this.PLUGIN, id);

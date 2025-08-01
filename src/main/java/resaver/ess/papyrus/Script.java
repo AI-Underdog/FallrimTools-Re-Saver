@@ -16,11 +16,9 @@
 package resaver.ess.papyrus;
 
 import resaver.ListException;
-import resaver.ess.AnalyzableElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.SortedSet;
 import java.util.stream.Collectors;
 import resaver.IString;
 import java.nio.ByteBuffer;

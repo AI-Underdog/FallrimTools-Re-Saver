@@ -27,7 +27,7 @@ import resaver.IString;
  */
 public class FragmentInfoPack extends FragmentBase {
 
-    public FragmentInfoPack(ByteBuffer input, ESPContext ctx) {
+    public FragmentInfoPack(ByteBuffer input, ESPContext<? extends PluginData> ctx) {
         this.UNKNOWN = input.get();
         this.FLAGS = input.get();
 

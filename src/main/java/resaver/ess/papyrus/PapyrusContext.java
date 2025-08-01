@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 import resaver.ess.Element;
@@ -442,11 +441,9 @@ public class PapyrusContext extends resaver.ess.ESS.ESSContext {
         Plugin[] KERNEL = this.getESS().getPluginInfo()
                 .stream()
                 .filter(p -> REACHABILITY.containsKey(p))
-                .toArray(l -> new Plugin[l]);
+                .toArray(Plugin[]::new);
 
-        int pass = 0;
         while (true) {
-            pass++;
             //System.out.println("Cross-referencing plugins: pass " + pass);
             boolean removedIntersections = cleanReachability(REACHABILITY, ELIMINATED, KERNEL);
             boolean extendedReachability = extendReachability(REACHABILITY, ELIMINATED, KERNEL);
@@ -454,7 +451,6 @@ public class PapyrusContext extends resaver.ess.ESS.ESSContext {
                 break;
             }
         }
-
         final mf.ConsoleProgress PROGRESS = new mf.ConsoleProgress();
         PROGRESS.toggleQuiet();
 

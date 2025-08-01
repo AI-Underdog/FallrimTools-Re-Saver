@@ -28,7 +28,7 @@ import static resaver.ess.ChangeFlagConstantsRefr.*;
  *
  * @author Mark Fairchild
  */
-public class ChangeFormRefr extends GeneralElement implements ChangeFormData, HasInitial {
+public class ChangeFormRefr extends GeneralElement implements HasInitial {
 
     /**
      * Creates a new <code>ChangeFormRefr</code> by reading from a

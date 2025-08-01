@@ -20,8 +20,6 @@ import resaver.Game;
 import java.util.Set;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -58,6 +56,7 @@ import resaver.ess.*;
 import resaver.ess.papyrus.*;
 import resaver.gui.FilterTreeModel.Node;
 import resaver.pex.AssemblyLevel;
+import java.io.File;
 import resaver.pex.PexFile;
 import resaver.gui.FilterFactory.ParseLevel;
 
@@ -77,6 +76,7 @@ final public class SaveWindow extends JFrame {
      * @param autoParse Automatically parse the specified savefile.
      */
     public SaveWindow(Path path, boolean autoParse) {
+        this.MI_SELECTGAMEDIR = new JMenuItem("Select Game Directory...");
         super.setExtendedState(PREFS.getInt("settings.extendedState", JFrame.MAXIMIZED_BOTH));
 
         this.JFXPANEL = PREFS.getBoolean("settings.javafx", true)
@@ -178,6 +178,7 @@ final public class SaveWindow extends JFrame {
         this.MI_SHOWLOG = new JMenuItem("Show Log", KeyEvent.VK_S);
         this.MI_ABOUT = new JMenuItem("About", KeyEvent.VK_A);
         this.MI_SUPPORT = new JMenuItem("Support");
+        // this.MI_MODIMPACT = new JMenuItem("Mod Impact Analysis"); // Commented out: not defined in field list
 
         this.BTN_CLEAR_FILTER = new JButton("Clear Filters");
         this.LOGWINDOW = new LogWindow();
@@ -252,12 +253,20 @@ final public class SaveWindow extends JFrame {
                 MI_SAVE,
                 MI_SAVEAS,
                 null,
+                MI_SELECTGAMEDIR,
                 MI_LOADESPS,
                 MI_WATCHSAVES,
                 null,
                 MI_EXPORTPLUGINS,
                 null,
                 MI_EXIT);
+        this.MI_SELECTGAMEDIR.addActionListener(e -> {
+            File selected = GameDirectoryChooserDialog.showDialog(this);
+            if (selected != null) {
+                JOptionPane.showMessageDialog(this, "Selected directory: " + selected.getAbsolutePath(), "Game Directory", JOptionPane.INFORMATION_MESSAGE);
+                // TODO: Use the selected directory as needed
+            }
+        });
 
         final JMenu PARSE_MENU = new JMenu("Changeforms");
         groupMenuItems(MI_SHOWPARSED0, MI_SHOWPARSED1, MI_SHOWPARSED2, MI_SHOWPARSED3);
@@ -385,6 +394,7 @@ final public class SaveWindow extends JFrame {
         this.MI_ABOUT.addActionListener(e -> AboutDialog.show(this));
         this.MI_SUPPORT.addActionListener(e -> SupportDialog.show(this));
         this.MI_USEMO2.addActionListener(e -> PREFS.putBoolean("settings.useMO2", this.MI_USEMO2.isSelected()));
+        // this.MI_MODIMPACT.addActionListener(e -> showModImpactDialog(getLoadedESPs())); // Commented out: not defined in field list
 
         this.MI_EXIT.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK));
         this.MI_LOAD.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
@@ -576,7 +586,8 @@ final public class SaveWindow extends JFrame {
     }
 
     private void showModPanel(Optional<Analysis> analysis) {
-        analysis.ifPresentOrElse(an -> {
+        if (analysis.isPresent()) {
+            Analysis an = analysis.get();
             final Mod[] MODS = new Mod[an.MODS.size()];
             an.MODS.toArray(MODS);
             Arrays.sort(MODS, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
@@ -586,7 +597,9 @@ final public class SaveWindow extends JFrame {
             this.MODCOMBO.setModel(modModel);
             this.MODCOMBO.setSelectedIndex(0);
             this.MODPANEL.setVisible(true);        
-        }, () -> hideModPanel());
+        } else {
+            hideModPanel();
+        }
     }
     
     private void hideModPanel() {
@@ -1099,7 +1112,10 @@ final public class SaveWindow extends JFrame {
             this.scanner = null;
         }
         
-        this.analysis.filter(an -> an.PLUGINS.equals(this.save.getPluginInfo())).ifPresentOrElse(this::setAnalysis, () -> {
+        Optional<Analysis> filteredAnalysis = this.analysis.filter(an -> an.PLUGINS.equals(this.save.getPluginInfo()));
+        if (filteredAnalysis.isPresent()) {
+            this.setAnalysis(filteredAnalysis.get());
+        } else {
             final Game GAME = this.save.getHeader().GAME;
 
             final Path GAME_DIR = Configurator.choosePathModal(this,
@@ -1140,7 +1156,7 @@ final public class SaveWindow extends JFrame {
                 this.scanner.execute();
                 this.setScanning(true);
             }                        
-        });
+        }
     }
 
     private void onScanProgress(String msg) {
@@ -1756,9 +1772,6 @@ final public class SaveWindow extends JFrame {
      */
     void findElement(Element element) {
         Objects.requireNonNull(element);
-        if (null == element) {
-            return;
-        }
 
         TreePath path = this.TREE.findPath(element);
 
@@ -1820,13 +1833,14 @@ final public class SaveWindow extends JFrame {
 
         if (NUM_INSTANCES > 0 && NUM_FORMS == 0) {
             final String FORMAT = "Deleted %d script instances from %d plugins.";
+           
             final String MSG = String.format(FORMAT, NUM_INSTANCES, plugins.size());
             JOptionPane.showMessageDialog(this, MSG, TITLE, JOptionPane.INFORMATION_MESSAGE);
 
         } else if (NUM_INSTANCES == 0 && NUM_FORMS > 0) {
             final String FORMAT = "Deleted %d changeforms from %d plugins.";
             final String MSG = String.format(FORMAT, NUM_FORMS, plugins.size());
-            JOptionPane.showMessageDialog(this, MSG, TITLE, JOptionPane.INFORMATION_MESSAGE);
+                       JOptionPane.showMessageDialog(this, MSG, TITLE, JOptionPane.INFORMATION_MESSAGE);
 
         } else if (NUM_INSTANCES > 0 && NUM_FORMS > 0) {
             final String FORMAT = "Deleted %d script instances and %d changeforms from %d plugins.";
@@ -2405,7 +2419,7 @@ final public class SaveWindow extends JFrame {
     final private class ModListCellRenderer implements ListCellRenderer<Mod> {
 
         @Override
-        public Component getListCellRendererComponent(JList list, Mod value, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<? extends Mod> list, Mod value, int index, boolean isSelected, boolean cellHasFocus) {
             if (null == value) {
                 return RENDERER.getListCellRendererComponent(list, null, index, isSelected, cellHasFocus);
             }
@@ -2421,7 +2435,7 @@ final public class SaveWindow extends JFrame {
     final private class PluginListCellRenderer implements ListCellRenderer<Plugin> {
 
         @Override
-        public Component getListCellRendererComponent(JList list, Plugin value, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<? extends Plugin> list, Plugin value, int index, boolean isSelected, boolean cellHasFocus) {
             if (null == value) {
                 return RENDERER.getListCellRendererComponent(list, null, index, isSelected, cellHasFocus);
             }
@@ -2494,6 +2508,7 @@ final public class SaveWindow extends JFrame {
     final private JMenuItem MI_SAVE;
     final private JMenuItem MI_SAVEAS;
     final private JMenuItem MI_EXIT;
+    final private JMenuItem MI_SELECTGAMEDIR;
     final private JMenuItem MI_LOADESPS;
     final private JMenuItem MI_LOOKUPID;
     final private JMenuItem MI_LOOKUPBASE;
@@ -2541,5 +2556,4 @@ final public class SaveWindow extends JFrame {
     static final private java.util.prefs.Preferences PREFS = java.util.prefs.Preferences.userNodeForPackage(resaver.ReSaver.class);
     static final private Logger LOG = Logger.getLogger(SaveWindow.class.getCanonicalName());
     static final private Pattern URLPATTERN = Pattern.compile("(?<type>[a-z]+):\\/\\/(?<address>[^\\[\\]]+)(?:\\[(?<target1>\\d+)\\])?(?:\\[(?<target2>\\d+)\\])?$");
-
 }

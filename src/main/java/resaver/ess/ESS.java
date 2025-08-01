@@ -1068,17 +1068,62 @@ final public class ESS implements Element {
 
         
         return p(
+                h2("📋 Enhanced Savegame Information Display"),
                 h3(this.ORIGINAL_FILE.toString()),
                 h3(String.format("%s the level %s %s %s, in %s on %s (%1.0f/%1.0f xp).", name, level, race, gender, location, gameDate, xp, nexp)),
+                h4("Comprehensive Header Information:"),
                 code(ul(
+                        // Game and Save Information
+                        li(String.format("Game: %s", this.HEADER.GAME.NAME)),
+                        li(String.format("Save Number: %d", this.HEADER.SAVENUMBER)),
+                        li(String.format("Version: %d", this.HEADER.VERSION)),
                         li(String.format("Version string: %s", this.VERSION_STRING)),
                         li(String.format("Form version: %s", this.FORMVERSION)),
                         li(String.format("Time: %s", DATE.toString())),
+                        li(String.format("File Time: 0x%016X", this.HEADER.FILETIME)),
+                        
+                        // Character Information  
+                        li(String.format("Character Name: %s", name)),
+                        li(String.format("Level: %d", level)),
+                        li(String.format("Race: %s", race)),
+                        li(String.format("Gender: %s", gender)),
+                        li(String.format("Location: %s", location)),
+                        li(String.format("Game Date: %s", gameDate)),
+                        li(String.format("Current XP: %1.0f", xp)),
+                        li(String.format("XP to Next Level: %1.0f", this.HEADER.NEEDED_XP)),
+                        li(String.format("XP Progress: %1.0f/%1.0f (%1.1f%%)", xp, nexp, (xp / nexp) * 100)),
+                        
+                        // Screenshot Information
+                        li(String.format("Screenshot Size: %dx%d (%d bytes per pixel)", 
+                            this.HEADER.SCREENSHOT_WIDTH, this.HEADER.SCREENSHOT_HEIGHT, this.HEADER.BYPP)),
+                        li(String.format("Screenshot Data: %d bytes", this.HEADER.SCREENSHOT.length)),
+                        
+                        // File Size and Compression
                         this.HEADER.getCompression().isCompressed() && Float.isFinite(fileSize)
-                                ? li(String.format("Total size: %1.1f mb (%1.1f mb with %s)</li>", calculatedSize, fileSize, this.HEADER.getCompression()))
+                                ? li(String.format("Total size: %1.1f mb (%1.1f mb with %s)", calculatedSize, fileSize, this.HEADER.getCompression()))
                                 : li(String.format("Total size: %1.1f mb", calculatedSize)),
+                        li(String.format("Compression: %s", this.HEADER.getCompression())),
+                        
+                        // Plugin and Mod Information
+                        li(String.format("Plugins: %d", this.PLUGINS.getFullPlugins().size())),
+                        this.supportsESL() 
+                                ? li(String.format("Light Plugins: %d", this.PLUGINS.getLitePlugins().size()))
+                                : li("Light Plugins: Not supported in this game version"),
+                        
+                        // Data Structure Sizes
                         li(String.format("Papyrus size: %1.1f mb", papyrusSize)),
                         li(String.format("ChangeForms size: %1.1f mb", changeFormsSize)),
+                        li(String.format("Form IDs: %d", this.FORMIDARRAY != null ? this.FORMIDARRAY.length : 0)),
+                        li(String.format("Visited Worldspaces: %d", this.VISITEDWORLDSPACEARRAY != null ? this.VISITEDWORLDSPACEARRAY.length : 0)),
+                        li(String.format("Global Data Tables: %d, %d, %d", 
+                            this.TABLE1.size(), this.TABLE2.size(), this.TABLE3.size())),
+                        
+                        // Game Features and Status
+                        li(String.format("ESL Support: %s", this.supportsESL() ? "Yes" : "No")),
+                        li(String.format("Compression Support: %s", this.supportsCompression() ? "Yes" : "No")),
+                        li(String.format("Has Co-save: %s", this.hasCosave() ? "Yes" : "No")),
+                        li(String.format("Save Status: %s", this.isBroken() ? "Broken/Corrupted" : "OK")),
+                        
                         li(analysis
                                 .map(an -> String.format("Total ScriptData in load order: %1.1f mb", an.getScriptDataSize() / 1048576.0f))
                                 .orElse("Total ScriptData in load order: not available"))

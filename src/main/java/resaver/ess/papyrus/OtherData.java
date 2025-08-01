@@ -23,7 +23,6 @@ import resaver.ess.Flags;
 import resaver.ess.GeneralElement;
 import resaver.ess.Element;
 import resaver.ess.ElementException;
-import resaver.ess.Linkable;
 
 /**
  *
@@ -153,9 +152,8 @@ public class OtherData extends GeneralElement implements PapyrusElement {
     static class Array1 extends GeneralElement {
 
         public Array1(ByteBuffer input, PapyrusContext context) throws ElementException {
-            final EID ID1 = super.readID32(input, "ID1", context);
+            super.readID32(input, "ID1", context);
             final EID ID2 = super.readID32(input, "ID2", context);
-            this.LINK1 = context.findAny(ID1);
             this.THREAD = context.findActiveScript(ID2);
         }
 
@@ -168,7 +166,6 @@ public class OtherData extends GeneralElement implements PapyrusElement {
             }
         }
 
-        final private Linkable LINK1;
         final private ActiveScript THREAD;
     }
 

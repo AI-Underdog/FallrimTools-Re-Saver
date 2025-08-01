@@ -20,7 +20,6 @@ import resaver.ListException;
 import java.util.List;
 import java.util.Objects;
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
 import resaver.pex.Opcode;
 
 /**

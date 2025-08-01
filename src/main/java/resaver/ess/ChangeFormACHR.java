@@ -27,7 +27,7 @@ import static resaver.ess.ChangeFlagConstantsAchr.*;
  *
  * @author Mark Fairchild
  */
-public class ChangeFormACHR extends GeneralElement implements ChangeFormData, HasInitial {
+public class ChangeFormACHR extends GeneralElement implements HasInitial {
 
     /**
      * Creates a new <code>ChangeFormACHR</code> by reading from a

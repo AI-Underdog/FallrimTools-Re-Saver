@@ -36,7 +36,11 @@ public class RecordBasic extends Record {
      * @throws RecordException 
      * 
      */
-    static public void skimRecord(RecordCode recordCode, Record.Header header, ByteBuffer input, ESPContext ctx) throws RecordException {
+    static public void skimRecord(RecordCode recordCode,
+                                  Record.Header header,
+                                  ByteBuffer input,
+                                  ESPContext<? extends PluginData> ctx)
+            throws RecordException {
         try {
             final FieldList FIELDS = new FieldList();
 
@@ -61,10 +65,14 @@ public class RecordBasic extends Record {
      * @param ctx The mod descriptor.
      * @throws RecordException
      */
-    public RecordBasic(RecordCode recordCode, Record.Header header, ByteBuffer input, ESPContext ctx) throws RecordException {
+    public RecordBasic(RecordCode recordCode,
+                       Record.Header header,
+                       ByteBuffer input,
+                       ESPContext<? extends PluginData> ctx)
+            throws RecordException {
         try {
             this.CODE = recordCode;
-            this.HEADER = header;       
+            this.HEADER = header;
             this.FIELDS = new FieldList();
 
             while (input.hasRemaining()) {

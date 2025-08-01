@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  */
 abstract public class PropertyData implements Entry {
 
-    static public PropertyData readPropertyData(byte type, ByteBuffer input, ESPContext ctx) {
+    static public PropertyData readPropertyData(byte type, ByteBuffer input, ESPContext<? extends PluginData> ctx) {
         assert input.hasRemaining() || type == 0 : "No input available, type = " + type;
 
         switch (type) {
@@ -261,7 +261,7 @@ abstract public class PropertyData implements Entry {
      */
     static public class StructData extends PropertyData {
 
-        public StructData(ByteBuffer input, ESPContext ctx) {
+        public StructData(ByteBuffer input, ESPContext<? extends PluginData> ctx) {
             int memberCount = input.getInt();
             this.MEMBERS = new java.util.ArrayList<>(memberCount);
 

@@ -41,7 +41,10 @@ abstract public class Record implements Entry {
      * @return A list of fields that were readFully.
      * @throws FieldException
      */
-    static final public FieldList readField(RecordCode parentCode, ByteBuffer input, ESPContext ctx) throws FieldException {
+    static final public FieldList readField(RecordCode parentCode,
+                                            ByteBuffer input,
+                                            ESPContext<? extends PluginData> ctx)
+            throws FieldException {
         return readFieldAux(parentCode, input, 0, ctx);
     }
 
@@ -58,7 +61,11 @@ abstract public class Record implements Entry {
      * @return A list of fields that were readFully.
      *
      */
-    static private FieldList readFieldAux(RecordCode parentCode, ByteBuffer input, int bigSize, ESPContext ctx) throws FieldException {
+    static private FieldList readFieldAux(RecordCode parentCode,
+                                          ByteBuffer input,
+                                          int bigSize,
+                                          ESPContext<? extends PluginData> ctx)
+            throws FieldException {
         assert input.hasRemaining();
         IString CODE = IString.get("null");
         
@@ -138,7 +145,9 @@ abstract public class Record implements Entry {
      * @throws RecordException
 	 * @throws FieldException
      */
-    static public Record readRecord(ByteBuffer input, ESPContext ctx) throws RecordException, FieldException {
+    static public Record readRecord(ByteBuffer input,
+                                    ESPContext<? extends PluginData> ctx)
+            throws RecordException, FieldException {
         // Read the record identification code.
         final byte[] CODEBYTES = new byte[4];
         input.get(CODEBYTES);
@@ -189,7 +198,9 @@ abstract public class Record implements Entry {
 	 * @throws FieldException
      * 
      */
-    static public void skimRecord(ByteBuffer input, ESPContext ctx) throws RecordException, FieldException {
+    static public void skimRecord(ByteBuffer input,
+                                  ESPContext<? extends PluginData> ctx)
+            throws RecordException, FieldException {
         // Read the record identification code.
         final byte[] CODEBYTES = new byte[4];
         input.get(CODEBYTES);
@@ -298,7 +309,8 @@ abstract public class Record implements Entry {
          * @param input The LittleEndianInput to readFully.
          * @param ctx The mod descriptor.
          */
-        public Header(ByteBuffer input, ESPContext ctx) {
+        public Header(ByteBuffer input,
+                      ESPContext<? extends PluginData> ctx) {
             this.FLAGS = input.getInt();
 
             int id = input.getInt();

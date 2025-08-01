@@ -15,37 +15,30 @@
  */
 package mf;
 
-import java.text.MessageFormat;
-import java.util.Objects;
+import java.util.LinkedList;
 
-/**
- *
- * @author Mark Fairchild
- */
 public class Checkpoints {
-    
-    public Checkpoints() {
+    // now type‐safe & uses diamond
+    private final LinkedList<Pair<String,Long>> POINTS = new LinkedList<>();
+
+    public Checkpoints() { }
+
+    public void addCheckPoint(String name, long point) {
+        POINTS.addLast(Pair.of(name, point));
     }
-    
-    public void AddCheckPoint(String name, long point) {
-        this.POINTS.addLast(Pair.of(name, point));
-    }
-    
-    public void VerifyCheckPoint(String name, long point) {
-        if (this.POINTS.isEmpty()) {
-            throw new IllegalStateException(String.format("Unmatched checkpoint (%s : %d)", name, point));
+
+    public void verifyCheckPoint(String name, long point) {
+        if (POINTS.isEmpty()) {
+            throw new IllegalStateException(
+                String.format("Unmatched checkpoint (%s : %d)", name, point));
         }
-        
-        Pair<String, Long> checkpoint = this.POINTS.removeFirst();
-        
-        if (point != checkpoint.B) 
-        {
-            throw new IllegalStateException(String.format("Checkpoint doesn't match (%s : %d) != (%s : %d)", checkpoint.A, checkpoint.B, name, point));
+
+        Pair<String,Long> checkpoint = POINTS.removeFirst();
+        if (point != checkpoint.B) {
+            throw new IllegalStateException(
+                String.format(
+                  "Checkpoint doesn't match (%s : %d) != (%s : %d)",
+                  checkpoint.A, checkpoint.B, name, point));
         }
     }
-    
-    final private java.util.LinkedList<Pair<String, Long>> POINTS = new java.util.LinkedList();
-    //final private MessageFormat MSG1 = new MessageFormat("Unmatched checkpoint ({0} : {1,number})");
-    //final private MessageFormat MSG2 = new MessageFormat("Checkpoint doesn't match ({0} : {1,number}) != ({2} : {3,number})");
-    
 }

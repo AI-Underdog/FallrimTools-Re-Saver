@@ -1,23 +1,38 @@
 {
-	// Use IntelliSense to learn about possible attributes.
-	// Hover to view descriptions of existing attributes.
-	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"type": "java",
-			"name": "Launch Current File",
-			"request": "launch",
-			"mainClass": "${file}"
-		},
-		{
-			"type": "java",
-			"name": "Launch ReSaver",
-			"request": "launch",
-			"mainClass": "resaver.ReSaver",
-			"projectName": "ReSaver",
-			"args": "-r",
-			"vmArgs": "-ea"
-		}
-	]
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch ReSaver",
+            "request": "launch",
+            "mainClass": "resaver.ReSaver",
+            "projectName": "resaver",
+            "vmArgs": "--module-path \"target/lib\" --add-modules javafx.controls,javafx.swing",
+            "args": "",
+            "console": "internalConsole"
+        },
+        {
+            "type": "java",
+            "name": "Debug ReSaver",
+            "request": "launch",
+            "mainClass": "resaver.ReSaver",
+            "projectName": "resaver",
+            "vmArgs": "--module-path \"target/lib\" --add-modules javafx.controls,javafx.swing",
+            "args": "",
+            "console": "internalConsole"
+        },
+        {
+            "type": "java",
+            "name": "Launch with JavaFX",
+            "request": "launch",
+            "mainClass": "resaver.ReSaver",
+            "projectName": "resaver",
+            "vmArgs": [
+                "--module-path",
+                "${workspaceFolder}/target/lib",
+                "--add-modules",
+                "javafx.controls,javafx.swing,javafx.base,javafx.graphics"
+            ]
+        }
+    ]
 }
